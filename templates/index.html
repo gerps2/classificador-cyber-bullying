@@ -8,12 +8,11 @@
 </head>
 <body class="bg-primary">
     <div class="container vh-100 d-flex align-items-center">
-        <div class="d-flex flex-column bg-light w-50 rounded shadow mx-auto my-auto p-5 align-items-center ">
+        <div class="d-flex flex-column bg-light w-xl-50 w-xxl-50 w-100  rounded shadow mx-auto my-auto p-5 align-items-center ">
             <h2 class="fw-bold">Validador de cyber bullying</h2>
 
-            <div class="form-floating w-100 mt-3">
-                <input type="text" class="form-control" placeholder="none" id="inputText">
-                <label for="inputText">Digite seu texto aqui de cyber bullying</label>
+            <div class="form-floating w-100 mt-3 w-none w-xl-block w-xxl-block">
+                <input type="text" class="form-control" placeholder=">Digite seu texto aqui de cyber bullying" id="inputText">
             </div>
 
             <p class="text-danger me-auto d-none" id="warningText">Talvez o texto que voce digitou nao esteja em ingles</p>
@@ -85,10 +84,10 @@
                     console.log(predictions);
 
                     const naiveBayesPrediction = predictions['Naive Bayes'][0];
-                    // const rnnPrediction = predictions['RNN'][0];
+                    const rnnPrediction = predictions['RNN'][0];
                     const svmPrediction = predictions['SVM'][0];
 
-                    if (naiveBayesPrediction === 1 && /*rnnPrediction === 1 &&*/ svmPrediction === 1) {
+                    if (naiveBayesPrediction === 1 && rnnPrediction === 1 && svmPrediction === 1) {
                         isCyberBulling.classList.remove('d-none');
                         isNotCyberBulling.classList.add('d-none');
                     } else {
@@ -103,11 +102,9 @@
                             <li class="list-group-item">
                                 Naive Bayes: ${naiveBayesPrediction === 1 ? 'Cyber Bullying' : 'Nao Cyber Bullying'}
                             </li>
-                            <!--
                             <li class="list-group-item">
-                                RNN: ${/*rnnPrediction*/0 === 1 ? 'Cyber Bullying' : 'Nao Cyber Bullying'}
+                                RNN: ${rnnPrediction === 1 ? 'Cyber Bullying' : 'Nao Cyber Bullying'}
                             </li>
-                            -->
                             <li class="list-group-item">
                                 SVM: ${svmPrediction === 1 ? 'Cyber Bullying' : 'Nao Cyber Bullying'}
                             </li>
