@@ -1,6 +1,6 @@
 import os
 from langdetect import detect
-# from bussiness.predictor import Predictor
+from bussiness.predictor import Predictor
 
 from flask import (Flask, redirect, render_template, request,
                    send_from_directory, url_for, jsonify)
@@ -29,21 +29,21 @@ def hello():
        print('Request for hello page received with no name or blank name -- redirecting')
        return redirect(url_for('index'))
    
-# @app.route('/api/predict', methods=['POST'])
-# def predict():
-#     data = request.get_json(force=True)
-#     texts = data['texts']
-#     predictions = predictor.predict(texts)
-#     return jsonify(predictions)
+@app.route('/api/predict', methods=['POST'])
+def predict():
+    data = request.get_json(force=True)
+    texts = data['texts']
+    predictions = predictor.predict(texts)
+    return jsonify(predictions)
 
-# @app.route('/api/detect-language', methods=['POST'])
-# def detect_language():
-#     data = request.get_json(force=True)
-#     text = data['text']
-#     language = detect(text)
-#     is_english = language == 'en'
-#     response = {'is_english': is_english}
-#     return jsonify(response)
+@app.route('/api/detect-language', methods=['POST'])
+def detect_language():
+    data = request.get_json(force=True)
+    text = data['text']
+    language = detect(text)
+    is_english = language == 'en'
+    response = {'is_english': is_english}
+    return jsonify(response)
 
 
 if __name__ == '__main__':

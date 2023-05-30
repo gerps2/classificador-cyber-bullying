@@ -1,30 +1,126 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <title>Hello Azure - Python Quickstart</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Cyber Bullying</title>
 </head>
-<html>
-   <body>
-     <main>
-        <div class="px-4 py-3 my-2 text-center">
-            <img class="d-block mx-auto mb-4" src="{{ url_for('static', filename='images/azure-icon.svg') }}" alt="Azure Logo" width="192" height="192"/>
-            <!-- <img  src="/docs/5.1/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
-            <h1 class="display-6 fw-bold text-primary">Welcome to Azure</h1>            
-          </div>
-        <form method="post" action="{{url_for('hello')}}">
-            <div class="col-md-6 mx-auto text-center">
-                <label for="name" class="form-label fw-bold fs-5">Could you please tell me your name?</label>
+<body class="bg-primary">
+    <div class="container vh-100 d-flex align-items-center">
+        <div class="d-flex flex-column bg-light w-50 rounded shadow mx-auto my-auto p-5 align-items-center ">
+            <h2 class="fw-bold">Validador de cyber bullying</h2>
 
-                <!-- <p class="lead mb-2">Could you please tell me your name?</p> -->
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center align-items-center my-1">
-                    <input type="text" class="form-control" id="name" name="name" style="max-width: 256px;">
-                  </div>            
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center my-2">
-                  <button type="submit" class="btn btn-primary btn-lg px-4 gap-3">Say Hello</button>
-                </div>            
+            <div class="form-floating w-100 mt-3">
+                <input type="text" class="form-control" placeholder="none" id="inputText">
+                <label for="inputText">Digite seu texto aqui de cyber bullying</label>
             </div>
-        </form>
-     </main>      
-   </body>
+
+            <p class="text-danger me-auto d-none" id="warningText">Talvez o texto que voce digitou nao esteja em ingles</p>
+            <p class="text-danger me-auto d-none" id="warningTextNoneValue">Digite um texto para validar</p>
+
+
+            <div class="border border-danger mt-5 rounded p-2 d-none" id="isCyberBulling">
+                <p class="text-danger m-0">Este texto e cyber bullying</p>
+            </div>
+
+            <div class="border border-success mt-5 rounded p-2 d-none" id="isNotCyberBulling">
+                <p class="text-success m-0">Este texto nao e cyber bullying</p>
+            </div>
+
+            <div id="modelsResults"></div>
+
+            <button type="button" class="btn btn-outline-primary mt-5" id="validateButton">
+                Validar texto
+                <div class="spinner-border text-primary spinner-border-sm d-none" role="status" id="spinner"></div>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        const validateButton = document.getElementById('validateButton');
+        const inputText = document.getElementById('inputText');
+        const warningText = document.getElementById('warningText');
+        const spinnerLoading = document.getElementById('spinner');
+        const noneText = document.getElementById('warningTextNoneValue');
+        const isCyberBulling = document.getElementById('isCyberBulling');
+        const isNotCyberBulling = document.getElementById('isNotCyberBulling');
+        const modelsResults = document.getElementById('modelsResults');
+
+        validateButton.addEventListener('click', () => {
+            const text = inputText.value;
+
+            if (text === '' || text === null || text === undefined) {
+                noneText.classList.remove('d-none');
+                isCyberBulling.classList.add('d-none');
+                isNotCyberBulling.classList.add('d-none');
+                modelsResults.innerHTML = '';
+            } else {
+                spinnerLoading.classList.remove('d-none');
+
+                axios.post('/api/detect-language', { "text": text })
+                    .then(response => {
+                        const isEnglish = response.data.is_english;
+                        warningText.classList.add('d-none');
+                        if (!isEnglish)
+                            warningText.classList.remove('d-none');
+
+                        getPredictions();
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }
+        });
+
+        async function getPredictions() {
+            const text = inputText.value;
+
+            axios.post('/api/predict', { "texts": [text] })
+                .then(response => {
+                    const predictions = response.data;
+                    console.log(predictions);
+
+                    const naiveBayesPrediction = predictions['Naive Bayes'][0];
+                    // const rnnPrediction = predictions['RNN'][0];
+                    const svmPrediction = predictions['SVM'][0];
+
+                    if (naiveBayesPrediction === 1 && /*rnnPrediction === 1 &&*/ svmPrediction === 1) {
+                        isCyberBulling.classList.remove('d-none');
+                        isNotCyberBulling.classList.add('d-none');
+                    } else {
+                        isNotCyberBulling.classList.remove('d-none');
+                        isCyberBulling.classList.add('d-none');
+                    }
+
+                    // Exibir os valores de previsão dos modelos
+                    modelsResults.innerHTML = `
+                        <p class="fw-bold mt-3">Valores de previsao dos modelos:</p>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                Naive Bayes: ${naiveBayesPrediction === 1 ? 'Cyber Bullying' : 'Nao Cyber Bullying'}
+                            </li>
+                            <!--
+                            <li class="list-group-item">
+                                RNN: ${/*rnnPrediction*/0 === 1 ? 'Cyber Bullying' : 'Nao Cyber Bullying'}
+                            </li>
+                            -->
+                            <li class="list-group-item">
+                                SVM: ${svmPrediction === 1 ? 'Cyber Bullying' : 'Nao Cyber Bullying'}
+                            </li>
+                        </ul>
+                    `;
+                })
+                .catch(error => {
+                    console.error(error);
+                })
+                .finally(() => {
+                    spinnerLoading.classList.add('d-none');
+                });
+        }
+    </script>
+</body>
 </html>

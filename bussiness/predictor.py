@@ -1,16 +1,11 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
-import numpy as np
 import pickle
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import string
 from dotenv import load_dotenv
-import os
 import boto3
-import io
-
-
 
 class Predictor:
     def __init__(self):
