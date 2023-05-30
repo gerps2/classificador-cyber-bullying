@@ -1,4 +1,5 @@
 import os
+import nltk
 from langdetect import detect
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
@@ -13,6 +14,10 @@ from flask import Flask, redirect, render_template, request, send_from_directory
 
 app = Flask(__name__)
 
+def download_nltk_resources():
+    nltk_resources = ['punkt', 'stopwords', 'wordnet']
+    for resource in nltk_resources:
+        nltk.download(resource)
 
 def load_model_from_s3(file_key):
     aws_access_key_id = "AKIARVGPJVYVKFVELC5U"
@@ -41,6 +46,11 @@ def vectorize_text(text_data, vectorizer):
     X_vec = vectorizer.transform(text_data)
     return X_vec
 
+@app.before_request
+def setup():
+    load_dotenv()
+    download_nltk_resources()
+
 @app.route('/')
 def index():
     print('Request for index page received')
@@ -66,7 +76,6 @@ def predict():
     data = request.get_json(force=True)
     texts = data['texts']
     
-    load_dotenv()
     nb_model = load_model_from_s3('nb_model.pkl')
     svm_model = load_model_from_s3('svm_model.pkl')
     vectorizer = load_model_from_s3('vectorizer.pkl')
