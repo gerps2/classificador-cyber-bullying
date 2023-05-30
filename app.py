@@ -13,6 +13,7 @@ from flask import Flask, redirect, render_template, request, send_from_directory
 
 app = Flask(__name__)
 
+
 def load_model_from_s3(file_key):
     aws_access_key_id = "AKIARVGPJVYVKFVELC5U"
     aws_secret_access_key = "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"
