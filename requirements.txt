@@ -2,6 +2,6 @@ Flask==2.3.2
 langdetect==1.0.9
 nltk==3.8.1
 scikit-learn==1.2.2
-gunicorn==20.1.0
 python-dotenv==1.0.0
 boto3==1.26.142
+gunicorn
